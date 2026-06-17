@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Login from './Login'
 import Quiz from './Quiz'
 import Results from './Results'
@@ -8,9 +8,21 @@ export default function App() {
   const [user, setUser] = useState(null)
   const [questions, setQuestions] = useState([])
   const [results, setResults] = useState(null)
+  const [resume, setResume] = useState(null)
 
-  async function handleLogin(name) {
+  useEffect(() => {
+    try {
+      const s = localStorage.getItem('quiz_state')
+      if (s) setResume(JSON.parse(s))
+    } catch {}
+  }, [])
+
+  async function handleLogin(name, isResume = false) {
     setUser(name)
+    if (isResume && resume) {
+      setQuestions(resume.questions)
+      return
+    }
     try {
       const res = await fetch('https://opentdb.com/api.php?amount=10&type=multiple')
       const data = await res.json()
@@ -28,5 +40,5 @@ export default function App() {
   if (!user) return <Login onLogin={handleLogin} />
   if (results) return <Results user={user} answers={results.answers} questions={results.questions} timedOut={results.timedOut} />
   if (!questions.length) return <p className="loading-state">Loading...</p>
-  return <Quiz user={user} questions={questions} onFinish={handleFinish} />
+  return <Quiz user={user} questions={questions} onFinish={handleFinish} resume={resume} />
 }

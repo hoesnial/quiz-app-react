@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 function shuffle(arr) {
   const a = [...arr]
@@ -21,14 +21,20 @@ function fmt(t) {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
-export default function Quiz({ user, questions, onFinish }) {
-  const [idx, setIdx] = useState(0)
-  const [shuffled, setShuffled] = useState([])
-  const [answers, setAnswers] = useState([])
+export default function Quiz({ user, questions, onFinish, resume }) {
+  const [idx, setIdx] = useState(resume?.currentIndex ?? 0)
+  const [shuffled, setShuffled] = useState(resume?.shuffledOptions ?? [])
+  const [answers, setAnswers] = useState(resume?.answers ?? [])
   const [selected, setSelected] = useState(null)
-  const [time, setTime] = useState(300)
+  const [time, setTime] = useState(resume?.timeLeft ?? 300)
   const timer = useRef(null)
   const done = useRef(false)
+
+  const persist = useCallback(() => {
+    localStorage.setItem('quiz_state', JSON.stringify({
+      user, currentIndex: idx, answers, timeLeft: time, shuffledOptions: shuffled, questions
+    }))
+  }, [user, idx, answers, time, shuffled, questions])
 
   useEffect(() => {
     if (!shuffled.length && questions.length) {
@@ -43,10 +49,13 @@ export default function Quiz({ user, questions, onFinish }) {
     return () => clearInterval(timer.current)
   }, [])
 
+  useEffect(() => { persist() }, [persist])
+
   useEffect(() => {
     if (time === 0 && !done.current) {
       done.current = true
       clearInterval(timer.current)
+      localStorage.removeItem('quiz_state')
       onFinish({ answers, questions, timedOut: true })
     }
   }, [time, answers, questions, onFinish])
@@ -59,6 +68,7 @@ export default function Quiz({ user, questions, onFinish }) {
     setTimeout(() => {
       if (idx + 1 >= questions.length) {
         clearInterval(timer.current)
+        localStorage.removeItem('quiz_state')
         onFinish({ answers: newAnswers, questions, timedOut: false })
       } else {
         setIdx(idx + 1)
