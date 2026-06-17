@@ -38,3 +38,22 @@
 .btn-pilihan:disabled { opacity: .7; cursor: default; }
 .loading-state { text-align: center; padding: 40px; color: #555; }
 .opsi-jawaban { margin-top: 4px; }
+
+.hasil-section { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+.hasil-panel { width: 100%; max-width: 400px; text-align: center; }
+.hasil-panel h1 { font-size: 1.5rem; margin-bottom: 4px; }
+.hasil-panel button { padding: 10px 32px; font-size: 1rem; cursor: pointer; border: 1px solid #000; background: #fff; }
+.hasil-panel button:hover { background: #eee; }
+.nama-pemain { font-weight: 600; margin-bottom: 4px; }
+.status-timeout { color: #b91c1c; font-weight: 600; margin-bottom: 16px; }
+.hasil-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 24px 0; }
+.stat-item { border: 1px solid #ccc; padding: 16px; }
+.stat-value { font-size: 1.5rem; font-weight: 700; display: block; }
+.stat-label { font-size: .8rem; color: #555; }
+.jumlah-benar .stat-value { color: #16a34a; }
+.jumlah-salah .stat-value { color: #b91c1c; }
+.total-soal .stat-value { color: #000; }
+.belum-jawab .stat-value { color: #999; }
+.score-progress { height: 6px; background: #ccc; margin: 16px 0 8px; }
+.score-indicator { height: 100%; background: #000; }
+.score-caption { color: #555; font-size: .85rem; margin-bottom: 20px; }

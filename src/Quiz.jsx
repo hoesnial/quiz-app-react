@@ -21,12 +21,14 @@ function fmt(t) {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
-export default function Quiz({ user, questions }) {
+export default function Quiz({ user, questions, onFinish }) {
   const [idx, setIdx] = useState(0)
   const [shuffled, setShuffled] = useState([])
+  const [answers, setAnswers] = useState([])
   const [selected, setSelected] = useState(null)
   const [time, setTime] = useState(300)
   const timer = useRef(null)
+  const done = useRef(false)
 
   useEffect(() => {
     if (!shuffled.length && questions.length) {
@@ -42,14 +44,23 @@ export default function Quiz({ user, questions }) {
   }, [])
 
   useEffect(() => {
-    if (time === 0) alert('Waktu habis!')
-  }, [time])
+    if (time === 0 && !done.current) {
+      done.current = true
+      clearInterval(timer.current)
+      onFinish({ answers, questions, timedOut: true })
+    }
+  }, [time, answers, questions, onFinish])
 
   function pick(answer) {
     if (selected) return
     setSelected(answer)
+    const newAnswers = [...answers, { questionIndex: idx, answer }]
+    setAnswers(newAnswers)
     setTimeout(() => {
-      if (idx + 1 < questions.length) {
+      if (idx + 1 >= questions.length) {
+        clearInterval(timer.current)
+        onFinish({ answers: newAnswers, questions, timedOut: false })
+      } else {
         setIdx(idx + 1)
         setSelected(null)
       }
